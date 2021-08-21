@@ -148,9 +148,9 @@ void generateXML(string SSID, string PASSWORD){
         altern[i]=toupper(altern[i]);
     }
     name_file="XML-CONFIG-"+altern+".XML";
-    altern="../lib/"+name_file;
+    complet="../lib/"+name_file;
     ofstream xml;
-    xml.open(altern, ios::out);
+    xml.open(complet, ios::out);
     if (xml.fail()) {
         cout<<" [1]. No tienes permisos en este directorio..."<<endl;
         exit(1);

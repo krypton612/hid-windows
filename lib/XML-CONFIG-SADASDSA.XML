@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
-	<name>metasploit12</name>
+	<name>sadasdsa</name>
 	<SSIDConfig>
 		<SSID>
-			<hex>6D65746173706C6F69743132</hex>
-			<name>metasploit12</name>
+			<hex>7361646173647361</hex>
+			<name>sadasdsa</name>
 		</SSID>
 	</SSIDConfig>
 	<connectionType>ESS</connectionType>
@@ -19,7 +19,7 @@
 			<sharedKey>
 				<keyType>passPhrase</keyType>
 				<protected>false</protected>
-				<keyMaterial>root1234</keyMaterial>
+				<keyMaterial>dsadasdsa</keyMaterial>
 			</sharedKey>
 		</security>
 	</MSM>
